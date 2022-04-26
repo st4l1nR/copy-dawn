@@ -1,0 +1,142 @@
+<div class="flex flex-col px-5 py-5 mx-auto mt-20 space-y-8 border-t max-w-7xl">
+    {% liquid
+        assign size = section.blocks.size | divided_by: 4 | plus: 1
+        assign lastIndex = 0
+        assign counter = 1
+    %}
+    {% for n in (1..size) %}
+        <div class="flex flex-col md:flex-row space-y-5 md:space-y-0 md:space-x-5 md:min-h-[100px]">
+            {% for block in section.blocks offset: lastIndex %}
+                {% case block.type %}
+                    {% when 'link_list' %}
+                        <div class="flex flex-col flex-1 space-y-3">
+                            <span class="text-lg">{{ block.settings.heading }}</span>
+                            <ul class="flex flex-col space-y-3 text-sm font-light">
+                                {% for link in block.settings.menu.links %}
+                                    <li>
+                                        <a class="border-black hover:border-b" href="{{ link.url }}">{{ link.title }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% when 'text' %}
+                        <div class="flex flex-col flex-1 space-y-3">
+                            <span class="text-lg">{{ block.settings.heading }}</span>
+                            <span class="font-light">{{ block.settings.subtext }}</span>
+                        </div>
+                    {% when 'image' %}
+                        <div class="flex-1">
+                            {% if block.settings.image != blank %}
+                                {{ block.settings.image | image_url : height:"224", width:"224" | image_tag: loading:"lazy", class:"mx-auto object-cover"}}
+                            {% else %}
+                                <div class="w-56 h-56">
+                                    {{ 'image' | placeholder_svg_tag: 'placeholder-svg placeholder' }}
+                                </div>
+                            {% endif %}
+
+                        </div>
+                {% endcase %}
+                {% if counter >= 4 %}
+                    {% assign lastIndex = forloop.index %}
+                    {% assign counter = 0 %}
+                    {% break %}
+                {% endif %}
+                {% assign counter = counter | plus: 1 %}
+            {% endfor %}
+        </div>
+    {% endfor %}
+    <div class="grid grid-cols-1 md:grid-cols-2">
+        {% form , 'customer' %}
+            <div class="flex max-w-xs px-3 py-2 border border-black h-11 focus-within:border focus-within:ring-black">
+                <input class="flex-1 w-full h-full p-0 border-0 focus-within:border-0 focus-within:ring-0" type="email" name="contact[email]" id="" value="{{ form.email }}" placeholder="Email">
+                <button>
+                    <img class="cursor-pointer" src="{{ 'arrow right.svg' | asset_url }}" alt="">
+                </button>
+
+            </div>
+            <div></div>
+        {% endform %}
+    </div>
+    <div class="flex flex-col space-y-5">
+        <div class="flex justify-center flex-space-x-3">
+            {% for type in shop.enabled_payment_types%}
+                {{ type | payment_type_svg_tag }}
+            {% endfor %}
+        </div>
+        <span class="text-sm font-light text-center">© 2022 yadamarket</span>
+    </div>
+
+</div>
+
+
+{% schema %}
+
+{
+    "name": "Footer",
+    "settings": [
+        {
+            "type": "header",
+            "content": "Email sign up",
+            "info": "Subscribers added automatically to your “accepted marketing” customer list."
+        }, {
+            "type": "checkbox",
+            "id": "show_email_signup",
+            "label": "Show email signup",
+            "default": true
+        }, {
+            "type": "text",
+            "id": "show_email_signup_heading",
+            "label": "Heading",
+            "default": "Subscribe to our emails"
+        }
+    ],
+    "blocks": [
+        {
+            "name": "Menu",
+            "type": "link_list",
+            "settings": [
+                {
+                    "type": "text",
+                    "id": "heading",
+                    "label": "Heading",
+                    "default": "Quick links",
+                    "info": "Heading is required for display the menu"
+                }, {
+                    "type": "link_list",
+                    "id": "menu",
+                    "label": "Menu",
+                    "default": "footer",
+                    "info": "Diplay only top levels menu items"
+                }
+            ]
+        }, {
+            "name": "Text",
+            "type": "text",
+            "settings": [
+                {
+                    "type": "text",
+                    "id": "heading",
+                    "label": "Heading",
+                    "default": "Heading"
+                }, {
+                    "type": "textarea",
+                    "id": "subtext",
+                    "label": "Subtext",
+                    "default": "Share contact information, store details, and brand content with your customers."
+                }
+            ]
+        }, {
+            "name": "Image",
+            "type": "image",
+            "settings": [
+                {
+                    "type": "image_picker",
+                    "id": "image",
+                    "label": "Image"
+                }
+            ]
+        }
+    ]
+}
+
+{% endschema %}

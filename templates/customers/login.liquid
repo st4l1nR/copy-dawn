@@ -1,0 +1,37 @@
+<div x-data="{show_forgot_password_form:false}" x-init="show_forgot_password_form = window.location.href.includes('#recover')">
+    {% form 'customer_login', x-show:"!show_forgot_password_form" %}
+        <div class="flex flex-col max-w-md px-5 mx-auto space-y-10" >
+            {% if form.errors %}
+                {% render 'form-errors', form:form %}
+            {% endif %}
+            <span class="text-4xl text-center">Login</span>
+            <div class="flex flex-col items-center space-y-3">
+                <input class="w-full" name="customer[email]" placeholder="Email" type="email">
+                <input class="w-full" name="customer[password]" placeholder="Password" type="password">
+                <div class="w-full text-start">
+                    <a href="#recover" @click="show_forgot_password_form = true" class="text-sm border-b border-black cursor-pointer">Forgot your password?</a>
+                </div>
+            </div>
+            <div class="flex flex-col items-center space-y-3">
+                <button class="w-32 h-12 btn-primary">Sign in</button>
+                <a class="text-sm border-b border-black" href="{{ routes.account_register_url }}">Create account</a>
+            </div>
+        </div>
+    {% endform %}
+    {% form 'recover_customer_password', x-show:"show_forgot_password_form"%}
+        <div class="flex flex-col max-w-md px-5 mx-auto space-y-10" x-show="">
+            <div class="flex flex-col space-y-5 text-center">
+                <span class="text-4xl">Reset your password</span>
+                <span class="text-sm font-light">We will send you an email to  reset your password</span>
+            </div>
+            {% if form.errors %}
+                {% render 'form-errors', form:form %}
+            {% endif %}
+            <input name="email" placeholder="Email" type="email">
+            <div class="flex flex-col items-center space-y-5">
+                <button class="w-32 h-12 btn-primary">Submit</button>
+                <a href="#login"  class="text-sm font-light border-b border-black cursor-pointer max-w-fit" @click="show_forgot_password_form = false">Cancel</a>
+            </div>
+        </div>
+    {% endform %}
+</div>

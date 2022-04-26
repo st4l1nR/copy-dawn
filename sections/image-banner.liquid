@@ -1,0 +1,121 @@
+{% liquid
+    assign banner_image = section.settings.image | image_url: width:1600
+%}
+<div :style="{backgroundImage:`url('https:{{ banner_image }}')`, color:'{{ section.settings.text_color }}'}" class="relative w-full h-80 md:h-[90vh] py-20 bg-center bg-cover text-center">
+    {% if section.settings.image == blank %}
+        <div class="absolute top-0 left-0 z-0 flex items-center w-full h-full bg-gray-500 bg-opacity-30">
+            {{ 'lifestyle-2' | placeholder_svg_tag: "w-full h-full*" }}
+        </div>
+
+    {% endif %}
+    <div class="relative z-20 flex flex-col items-center h-full mx-auto space-y-5 max-w-7xl {{ section.settings.alignment }}">
+        {% for block in section.blocks %}
+            {% case block.type %}
+                {% when 'header' %}
+                    <span class="text-5xl">{{ block.settings.text }}</span>
+                {% when 'text' %}
+                    <span class="text-xl">{{ block.settings.text }}</span>
+                {% when 'button' %}
+                    <a class="w-48 h-12 {{ block.settings.style }}" href="{{ block.settings.link }}">
+                        {{ block.settings.text }}
+                    </a>
+
+            {% endcase %}
+        {% endfor %}
+    </div>
+</div>
+{% schema %}
+
+{
+    "name": "Image banner",
+    "settings": [
+        {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+        }, {
+            "type": "select",
+            "id": "alignment",
+            "label": "Alignment",
+            "options": [
+                {
+                    "value": "justify-start",
+                    "label": "start"
+                }, {
+                    "value": "justify-center",
+                    "label": "center"
+                }, {
+                    "value": "justify-end",
+                    "label": "end"
+                }
+            ],
+            "default": "justify-center"
+        }, {
+            "type": "color",
+            "id": "text_color",
+            "label": "Text color",
+            "default": "#ffffff"
+        }
+    ],
+    "blocks": [
+        {
+            "name": "Header",
+            "type": "header",
+            "settings": [
+                {
+                    "type": "text",
+                    "id": "text",
+                    "label": "text"
+                }
+            ]
+        }, {
+            "name": "Text",
+            "type": "text",
+            "settings": [
+                {
+                    "type": "textarea",
+                    "id": "text",
+                    "label": "Text",
+                    "default": "Atypical leather goods"
+                }
+            ]
+        }, {
+            "name": "Button",
+            "type": "button",
+            "settings": [
+                {
+                    "type": "text",
+                    "id": "text",
+                    "label": "Text",
+                    "default": "Button"
+                }, {
+                    "type": "url",
+                    "id": "link",
+                    "label": "Link"
+                }, {
+                    "type": "select",
+                    "id": "style",
+                    "label": "Style",
+                    "options": [
+                        {
+                            "value": "btn-primary",
+                            "label": "primary"
+                        }, {
+                            "value": "btn-secondary",
+                            "label": "secondary"
+                        }, {
+                            "value": "btn-primary-outlined",
+                            "label": "primary outlined"
+                        }, {
+                            "value": "btn-secondary-outlined",
+                            "label": "seconadry outlined"
+                        }
+                    ],
+                    "default": "btn-primary"
+                }
+            ]
+        }
+    ]
+}
+
+{% endschema %}

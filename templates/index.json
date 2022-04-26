@@ -1,0 +1,111 @@
+{
+  "sections": {
+    "image_banner": {
+      "type": "image-banner",
+      "blocks": {
+        "header": {
+          "type": "header",
+          "settings": {
+            "text": "Industrial design meets fashion."
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "Give customers details about the banner image(s) or content on the template."
+          }
+        },
+        "button": {
+          "type": "button",
+          "settings": {
+            "text": "Shop now",
+            "link": "#"
+          }
+        }
+      },
+      "block_order": ["header", "text", "button"]
+    },
+    "featured_collection": {
+      "type": "featured-collection",
+      "settings": {
+        "header": "Featured collection",
+        "collection": "all",
+        "max_products": 4
+      }
+    },
+    "rich_text": {
+      "type": "rich-text",
+      "blocks": {
+        "header": {
+          "type": "header",
+          "settings": {
+            "text": "Obsessive Attention. Intelligent Effort."
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "Functional handbags made of luxurious materials to improve people's lives in small but mighty ways."
+          }
+        }
+      },
+      "block_order": ["header", "text"]
+    },
+    "collage": {
+      "type": "collage",
+      "settings": {
+        "header": "Multimedia collage"
+      },
+      "blocks": {
+        "collection-1": {
+          "type": "collection",
+          "settings": {}
+        },
+        "product-1": {
+          "type": "product",
+          "settings": {}
+        },
+        "collection-2": {
+          "type": "collection",
+          "settings": {}
+        }
+      },
+      "block_order": ["collection-1", "product-1", "collection-2"]
+    },
+    "multicolumn": {
+      "type": "multicolumn",
+      "settings": {
+        "header": "Multicolumn"
+      },
+      "blocks": {
+        "column-1": {
+          "type": "column",
+          "settings": {}
+        },
+        "column-2": {
+          "type": "column",
+          "settings": {}
+        },
+        "column-3": {
+          "type": "column",
+          "settings": {}
+        }
+      },
+      "block_order": ["column-1", "column-2", "column-3"]
+    },
+    "video":{
+      "type":"video",
+      "settings":{
+        "url":"https://www.youtube.com/watch?v=_9VUPq3SxOc"
+      }
+    }
+  },
+  "order": [
+    "image_banner",
+    "rich_text",
+    "featured_collection",
+    "collage",
+    "multicolumn",
+    "video"
+  ]
+}

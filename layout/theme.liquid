@@ -1,0 +1,64 @@
+<!doctype html>
+<html class="no-js" lang="{{ request.locale.iso_code }}">
+    <head>
+        <meta charset="utf-8">
+        <meta content="IE=edge" http-equiv="X-UA-Compatible">
+        <meta content="width=device-width,initial-scale=1" name="viewport">
+        <meta content="" name="theme-color">
+        <link rel="canonical" href="{{ canonical_url }}">
+        <link crossorigin href="https://cdn.shopify.com" rel="preconnect">
+        <link href="https://fonts.googleapis.com" rel="preconnect">
+        <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+        <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@200;300;400;500;600;700;800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="{{ 'style.css' | asset_url }}">
+        {{ 'app.js' | asset_url | script_tag}}
+        <link href="https://unpkg.com/swiper@8/swiper-bundle.min.css" rel="stylesheet"/>
+        <script type="module">
+            import Swiper from "https://unpkg.com/swiper@8/swiper-bundle.esm.browser.min.js"
+            const swiper = new Swiper('.swiper')
+        </script>
+
+
+        {%- if settings.favicon != blank -%}
+            <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
+        {%- endif -%}
+
+        <title>
+            {{ page_title }}
+            {%- if current_tags %}
+                &ndash; tagged "{{ current_tags | join: ', ' }}"
+            {% endif -%}
+            {%- if current_page != 1 %}
+                &ndash; Page
+                {{ current_page }}
+            {% endif -%}
+            {%- unless page_title contains shop.name %}
+                &ndash;
+                {{ shop.name }}
+            {% endunless -%}
+        </title>
+
+        {% if page_description %}
+            <meta name="description" content="{{ page_description | escape }}">
+        {% endif %}
+
+        {% render 'meta-tags' %}
+
+        <script src="{{ 'global.js' | asset_url }}" defer="defer"></script>
+        {{ content_for_header }}
+
+    </head>
+
+    <body>
+        <header>
+            {% section 'announcement-bar' %}
+            {% section 'header' %}
+        </header>
+
+        <main class="font-sans">
+            {{ content_for_layout }}
+        </main>
+
+        {% section 'footer' %}
+    </body>
+</html>

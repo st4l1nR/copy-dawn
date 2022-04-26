@@ -1,0 +1,31 @@
+{{ 'utils.js' | asset_url | script_tag }}
+{% liquid
+    assign number = search.filters.size
+    assign sort_by = search.sort_by | default: search.default_sort_by
+%}
+<div @update-search.window="updateSections('search', $event.detail.query, ['{{ section.id }}'], ['#product_grid'])" class="min-h-screen px-5 mx-auto max-w-7xl" x-data="{loading:false, updateSections:utils.updateSections}">
+    <div class="flex flex-col max-w-lg mx-auto space-y-5">
+        <span class="text-2xl text-center">Search results</span>
+        {% render 'search-form' %}
+    </div>
+    {% render 'filters-form', target:search, type:'search', action:routes.search_url, enable_filters:true, enable_sort_by:true %}
+    <div id="product_grid">
+        {% paginate search.results by 5 %}
+            <div :class="loading && 'opacity-50'" class="grid grid-cols-2 gap-5 mt-10 md:grid-cols-4 relative">
+                {% for result in search.results %}
+                    {% case result.object_type %}
+                        {% when 'product' %}
+                            {% render 'product-card', product:result %}
+                        {% else %}
+                    {% endcase %}
+                {% endfor %}
+                <div class="absolute top-1/2 left-1/2" x-show="loading">
+                    {% render 'spinner' %}
+                </div>
+            </div>
+            {% render 'pagination', paginate:paginate %}
+
+        {% endpaginate %}
+
+    </div>
+</div>

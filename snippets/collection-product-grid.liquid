@@ -1,0 +1,8 @@
+{% paginate collection.products by section.settings.products_per_page %}
+    <div class="grid grid-cols-1 gap-5 mt-10 md:grid-cols-4">
+        {% for product in collection.products %}
+            {% render 'product-card', product:product %}
+        {% endfor %}
+    </div>
+    {% include 'pagination', paginate:paginate %}
+{% endpaginate %}

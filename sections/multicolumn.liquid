@@ -1,0 +1,68 @@
+<div class="px-5 mx-auto mt-10 max-w-7xl" x-data="{size:'{{ section.blocks.size }}'}">
+    <span class="text-2xl">{{ section.settings.header }}</span>
+    <div :class="{'md:grid-cols-2':(size == 2),'md:grid-cols-3':(size >= 3 )}" class="grid grid-cols-1 gap-10 mt-10 text-center">
+        {% for block in section.blocks %}
+            <div class="flex flex-col space-y-5">
+                <span class="text-lg">{{ block.settings.header }}</span>
+                <span class="font-light">{{ block.settings.description }}</span>
+            </div>
+        {% endfor %}
+    </div>
+    {% if section.settings.button_label != blank %}
+        {% assign label = section.settings.button_label %}
+        {% assign link = section.settings.button_link %}
+        <div>
+            <a class="h-12 btn-primary w-48 mx-auto mt-10 {% if link == blank %} cursor-not-allowed {% endif %}>" {% if link != blank %}  href="{{ link }}" {% endif %} >
+                {{ label }}
+            </a>
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+{% schema %}
+
+{
+    "name": "Multicolumn",
+    "settings": [
+        {
+            "type": "text",
+            "id": "header",
+            "label": "Header"
+        }, {
+            "type": "header",
+            "content": "Button"
+        }, {
+            "type": "text",
+            "id": "button_label",
+            "label": "Button label"
+        }, {
+            "type": "url",
+            "id": "button_link",
+            "label": "Button link"
+        }
+    ],
+    "blocks": [
+        {
+            "name": "Column",
+            "type": "column",
+            "settings": [
+                {
+                    "type": "text",
+                    "id": "header",
+                    "label": "Header",
+                    "default": "Column"
+                }, {
+                    "type": "textarea",
+                    "id": "description",
+                    "label": "Description",
+                    "default": "Pair text with an image to focus on your chosen product, collection, or blog post. Add details on availability, style, or even provide a review."
+                }
+            ]
+        }
+    ]
+}
+
+{% endschema %}

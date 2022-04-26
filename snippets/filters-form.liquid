@@ -1,0 +1,133 @@
+<script>
+    const resolvers = {
+        handleSubmit(action = 'search') {
+            const formData = new FormData(this.$refs.filter_form)
+            let query = new URLSearchParams(formData)
+            if (action == "clear") {
+                query = `q=${query.get('q')}`
+                this.$refs.filter_form.querySelectorAll('input:checked').forEach(input => {
+                    input.checked = false
+                })
+                this.$refs.filter_form.querySelectorAll('input[type=number]').forEach(input => {
+                    input.value = ''
+                })
+            } else {
+                query = query.toString()
+            }
+            if ("{{ type }}" == "search") {
+                this.$dispatch("update-search", {query: query})
+            } else {
+                this.$dispatch("update-collection", {query: query})
+            }
+
+        }
+    }
+</script>
+
+<div x-data="{...resolvers}">
+    {%- comment -%}
+        Desktop
+    {%- endcomment -%}
+    <form class="justify-between hidden mt-10 text-sm md:flex" action="{{ action }}" @submit.prevent="handleSubmit" x-ref="filter_form">
+        <input class="hidden" type="submit" x-ref="submit">
+
+        {% if type == 'search' %}
+            <input type="hidden" name="q" value="{{ search.terms }}">
+        {% endif %}
+
+        <div class="flex space-x-5 ">
+            {% if enable_filters == true %}
+                <span class="align-middle">Filter:</span>
+                <div class="flex space-x-5" x-data="{current:null}">
+
+                    {% for filter in target.filters %}
+                        <div class="relative group">
+                            <div @click="current = '{{ forloop.index }}'" class="flex space-x-2 cursor-pointer">
+                                <span>{{ filter.label }}</span>
+                                <img src="{{ 'chevron down.svg ' | asset_url }}" alt="">
+                            </div>
+                            <div @click.away="current = null" class="absolute left-0 z-40 p-5 mt-2 origin-top-left bg-white shadow-xl" x-show="current == '{{ forloop.index }}'" x-transition:enter-end="translate-y-0 opacity-100" x-transition:enter-start="-translate-y-5 opacity-0" x-transition:enter="transition ease-out duration-300">
+                                {% case filter.type %}
+                                    {% when 'list' or 'boolean' %}
+                                        {% for filter_value in filter.values %}
+                                            <div class="flex flex-col w-40 p-5 space-y-3 {% if filter_value.count == 0 %} opacity-50 {% endif %}">
+                                                <div class="flex space-x-3">
+                                                    <input type="checkbox" name="{{ filter_value.param_name }}" value="{{ filter_value.value }}" {% if filter_value.active %} checked {% endif %} {% if filter_value.count == 0 %} disabled {% endif %} @change="handleSubmit">
+                                                    <span class="flex-1">{{ filter_value.label }}
+                                                        ({{ filter_value.count }})</span>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% when 'price_range' %}
+                                        <div>
+                                            <div class="relative flex h-full space-x-5 w-80">
+                                                <div class="flex items-center flex-1 space-x-2">
+                                                    <span>{{ cart.currency.symbol }}</span>
+                                                    <input class="flex-1 w-full border-black focus-within:ring-black focus-within:border-black" type="number" name="{{ filter.min_value.param_name }}" value="{{ filter.min_value.value | money_without_currency }}" placeholder="From" min="0" max="{{ filter.range_max | money_without_currency }}"/>
+                                                </div>
+                                                <div class="flex items-center flex-1 space-x-2">
+                                                    <span>{{ cart.currency.symbol }}</span>
+                                                    <input class="flex-1 w-full border-black focus-within:ring-black focus-within:border-black" type="number" name="{{ filter.max_value.param_name }}" value="{{ filter.max_value.value | money_without_currency }}" placeholder="To" min="0" max="{{ filter.range_max | money_without_currency }}"/>
+                                                </div>
+                                            </div>
+                                            <button>Apply</button>
+                                        </div>
+                                    {% else %}
+
+                                {% endcase %}
+                            </div>
+                        </div>
+
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="flex space-x-5">
+            {% if enable_sort_by == true %}
+                <span class="align-middle">Sort By:</span>
+                <div>
+                    <select class="py-0 text-sm border-0 focus-within:border-0 focus-within:ring-0" name="sort_by" x-on:change="$refs.submit.click()">
+                        {% for option in target.sort_options %}
+                            <option value="{{ option.value }}" {% if option.value == sort_by %} selected="selected" {% endif %}>{{ option.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            {% endif %}
+
+            <span id="result_count">
+                {% if type == 'search' %}
+                    {{ search.results_count }}
+
+                {% else %}
+                    {{ collection.products_count }}
+                {% endif %}
+                results
+            </span>
+        </div>
+    </form>
+
+    {%- comment -%}
+        Mobile
+    {%- endcomment -%}
+    <div class="md:hidden">
+        <div class="flex items-center justify-between mt-10 text-lg">
+            <div @click="$dispatch('toggle-filters')" class="flex space-x-2 cursor-pointer group">
+                <img src="{{ 'filter and sort.svg ' | asset_url }}" alt="">
+                <span class="border-black group-hover:border-b">Fitler and sort</span>
+            </div>
+            <span class="text-sm">
+                <span class="font-light">
+                    {% if type == 'search' %}
+                        {{ search.results_count }}
+
+                    {% else %}
+                        {{ collection.all_products_count }}
+                    {% endif %}
+                    results
+                </span>
+            </span>
+        </div>
+        {% render 'filters-drawer', target:target, type:type, action:action, enable_filters:enable_filters, enable_sort_by:enable_sort_by  %}
+    </div>
+</div>

@@ -1,0 +1,92 @@
+<div class="max-w-7xl px-5 mx-auto">
+    <span class="text-4xl">Account</span>
+    <a class="flex space-x-2 font-light mt-5" href="{{ routes.account_logout_url }}">
+        <img class="w-4" src="{{ 'person.svg' | asset_url }}" alt="">
+        <span class="border-b border-black text-sm">Log out</span>
+    </a>
+    <div class="flex flex-col md:flex-row mt-20 md:space-x-10 space-y-10">
+        <div class="md:basis-3/4 flex flex-col">
+            <span class="text-2xl pb-5 md:pb-0">Order history</span>
+            {% if customer.orders.size > 0 %}
+                {%- comment -%}
+                    Desktop
+                {%- endcomment -%}
+                <table class="table-auto hidden md:table w-full mt-10" wid>
+                    <thead class="drop-shadow-lg border">
+                        <tr class="py-5 text-xs text-left border">
+                            <th class="font-light p-4">ORDER</th>
+                            <th class="font-light py-4 pr-4">DATE</th>
+                            <th class="font-light py-4 pr-4">PAYMENT STATUS</th>
+                            <th class="font-light py-4 pr-4">FULLFILMENT STATUS</th>
+                            <th class="font-light py-4 pr-4 text-right">TOTAL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in customer.orders %}
+                            <tr class="border">
+                                <td class="p-4">
+                                    <a class="border hover:ring-1  ring-gray-300 py-2 px-3 text-sm font-light" href="{{ order.customer_url }}">
+                                        #{{ order.order_number }}
+                                    </a>
+                                </td>
+                                <td class="py-4 pr-4">
+                                    {{ order.created_at | date: format: 'abbreviated_date' }}
+                                </td>
+                                <td class="py-4 pr-4">{{ order.financial_status | capitalize }}</td>
+                                <td class="py-4 pr-4">{{ order.fulfillment_status | capitalize }}</td>
+                                <td class="py-4 pr-4 text-right">{{ order.total_price | money_with_currency }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {%- comment -%}
+                    Mobile
+                {%- endcomment -%}
+                <div class="flex flex-col divide-y md:hidden">
+                    {% for order in customer.orders %}
+                        <div class="flex flex-col space-y-3 pt-10 pb-5 md:hidden ">
+                            <div class="flex justify-between">
+                                <div class="font-light text-sm">ORDER</div>
+                                <a class="border hover:ring-1  ring-gray-300 py-2 px-3 text-sm font-light" href="{{ order.customer_url }}">
+                                    #{{ order.order_number }}
+                                </a>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="font-light text-sm">DATE</span>
+                                <span>{{ order.created_at | date: format:"abbreviated_date" }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="font-light text-sm">PAYMENT STATUS</span>
+                                <span>{{ order.financial_status | capitalize }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="font-light text-sm">FULLFILLMENT STATUS</span>
+                                <span>{{ order.fulfillment_status | capitalize }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="font-light text-sm">TOTAL</span>
+                                <span>{{ order.total_price | money_with_currency }}</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <span class="mt-2 text-lg font-light">You haven't placed any orders yet.</span>
+            {% endif %}
+        </div>
+        <div class="basis-1/4 flex flex-col space-y-5">
+            <span class="text-2xl">Account details</span>
+            <div class=" flex flex-col space-y-1 font-light">
+                <span>{{ customer.first_name }}
+                    {{ customer.last_name }}</span>
+                <span>{{ customer.default_address.street }}</span>
+                <span>{{ customer.default_address.zip }}</span>
+                <span>{{ customer.default_address.country }}</span>
+                <span>{{ customer.default_address.city }}</span>
+            </div>
+            <div>
+                <a class="text-sm font-light border-b border-black" href="{{ routes.account_addresses_url }}">View addresses ({{ customer.addresses.size }})</a>
+            </div>
+        </div>
+    </div>
+</div>

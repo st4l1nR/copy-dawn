@@ -1,0 +1,79 @@
+<div class="px-5 mx-auto mt-10 max-w-7xl" x-data="{size:'{{ section.blocks.size }}'}">
+    <span class="text-2xl">{{ section.settings.header }}</span>
+    <div :class="{'grid-cols-2 grid-rows-2 md:grid-cols-3':(size == 3), 'grid-cols-2 md:grid-cols-3':(size == 2), 'grid-cols-1':(size == 1)}" class="min-h-[500px] grid gap-5 mt-10">
+        {% for block in section.blocks %}
+            <div class="" {% if forloop.index == 1 %} :class="{'col-span-2 md:row-span-2':(size == 3), 'md:col-span-2':(size == 2)}" {% endif %}>
+                {% case block.type %}
+                    {% when 'collection' %}
+                        {% assign collection = block.settings.collection %}
+                        {% if collection != blank %}
+                            {% render 'collection-card', collection:collection %}
+                        {% else %}
+                            <a class="flex items-center h-full p-5 bg-gray-100 group" href="/">
+                                <div class="flex space-x-5">
+                                    <span class="text-xl">Your collection's name</span>
+                                    <img class="transition-all transform group-hover:translate-x-2" src="{{ 'arrow right.svg' | asset_url }}" alt="">
+                                </div>
+                            </a>
+                        {% endif %}
+
+                    {% when 'product' %}
+                        {% assign product = block.settings.product %}
+                        {% if product != blank %}
+                            {% render 'product-card', product:product %}
+                        {% else %}
+                            <a class="flex items-center h-full p-5 bg-gray-100 group" href="/">
+                                <div>
+                                    <span class="text-xl border-black group-hover:border-b">Example product title</span>
+                                </div>
+                            </a>
+                        {% endif %}
+
+                {% endcase %}
+            </div>
+        {% endfor %}
+    </div>
+
+
+</div>
+
+
+{% schema %}
+
+{
+    "name": "Collage",
+    "settings": [
+        {
+            "type": "text",
+            "id": "header",
+            "label": "Header",
+            "default": "Collage"
+        }
+    ],
+    "blocks": [
+        {
+            "name": "Collection",
+            "type": "collection",
+            "settings": [
+                {
+                    "type": "collection",
+                    "id": "collection",
+                    "label": "Collection"
+                }
+            ]
+        }, {
+            "name": "Product",
+            "type": "product",
+            "settings": [
+                {
+                    "type": "product",
+                    "id": "product",
+                    "label": "Product"
+                }
+            ]
+        }
+    ],
+    "max_blocks":3
+}
+
+{% endschema %}

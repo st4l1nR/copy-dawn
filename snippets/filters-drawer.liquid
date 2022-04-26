@@ -1,0 +1,85 @@
+<div @toggle-filters.window="open = !open" class="fixed inset-0 z-50 bg-black bg-opacity-70" x-data="{open:false}" x-show="open">
+    <div @click.away="open = false" class="absolute top-0 right-0 z-30 w-full h-screen max-w-xs bg-white flex flex-col" x-show="open" x-transition:enter-end="opacity-100 translate-x-100" x-transition:enter-start="opacity-0 translate-x-full" x-transition:enter="transition ease-out" x-transition:leave-end="opacity-0 translate-x-full" x-transition:leave-start="opacity-100 transalte-x-100" x-transition:leave="transition ease-in">
+        <div class="flex justify-end p-3 border-b ">
+            <div class="flex flex-col flex-1 space-y-1 text-sm text-center">
+                <span>Filter and sort</span>
+                <div class="font-light">
+                    <span id="result_count">
+                        {% if type == 'search' %}
+                            {{ search.results_count }}
+
+                        {% else %}
+                            {{ collection.products_count }}
+                        {% endif %}
+                        results
+                    </span>
+
+                </div>
+            </div>
+            <img class="cursor-pointer w-7 h-7 " src="{{ 'close.svg' | asset_url }}" @click="$dispatch('toggle-filters')"/>
+        </div>
+        <form class="relative px-5" action="{{ action }}" @submit.prevent="handleSubmit" x-ref="filter_form">
+            <input class="hidden" type="submit" x-ref="submit">
+            {% if type == 'search' %}
+                <input type="hidden" name="q" value="{{ search.terms }}">
+            {% endif %}
+            <div class="flex flex-col pt-10 space-y-5 font-light" x-data="{current:null}">
+                {% if enable_filters == true %}
+                    {% for filter in target.filters %}
+                        <div x-data="{ index:'{{ forloop.index }}'}">
+                            <div @click="current = index" class="flex justify-between cursor-pointer group">
+                                <span>{{ filter.label }}</span>
+                                <img src="{{ 'arrow right.svg' | asset_url }}" alt="">
+                            </div>
+                            <div class="absolute top-0 right-0 pt-5 flex flex-col w-full h-full space-y-5 px-5 bg-white" x-show="current == index" x-transition:enter-end="opacity-100 translate-x-100" x-transition:enter-start="opacity-0 translate-x-full" x-transition:enter="transition ease-out duration-300" x-transition:leave-end="opacity-0 translate-x-full" x-transition:leave-start="opacity-100 transalte-x-100" x-transition:leave="transition ease-in duration-300">
+                                <button @click="current = null" class="flex space-x-2" type="button">
+                                    <img src="{{ 'arrow left.svg' | asset_url }}" alt="">
+                                    <span>{{ filter.label }}</span>
+                                </button>
+                                {% case filter.type %}
+                                    {% when 'list' or 'boolean' %}
+                                        {% for filter_value in filter.values %}
+                                            <div class="flex space-x-3 {% if filter_value.count == 0 %} opacity-50 {% endif %}">
+                                                <input type="checkbox" name="{{ filter_value.param_name }}" value="{{ filter_value.value }}" {% if filter_value.active %} checked {% endif %} {% if filter_value.count == 0 %} disabled {% endif %} x-on:change="$refs.submit.click()">
+                                                <span class="flex-1">{{ filter_value.label }}
+                                                    ({{ filter_value.count }})</span>
+                                            </div>
+                                        {% endfor %}
+                                    {% when 'price_range' %}
+                                        <div class="flex h-full space-x-5">
+                                            <div class="flex items-center flex-1 space-x-2">
+                                                <span>{{ cart.currency.symbol }}</span>
+                                                <input class="flex-1 w-full border-black focus-within:ring-black focus-within:border-black" type="number" name="{{ filter.min_value.param_name }}" value="{{ filter.min_value.value | money_without_currency }}" placeholder="From" min="0" max="{{ filter.range_max | money_without_currency }}"/>
+                                            </div>
+                                            <div class="flex items-center flex-1 space-x-2">
+                                                <span>{{ cart.currency.symbol }}</span>
+                                                <input class="flex-1 w-full border-black focus-within:ring-black focus-within:border-black" type="number" name="{{ filter.max_value.param_name }}" value="{{ filter.max_value.value | money_without_currency }}" placeholder="To" min="0" max="{{ filter.range_max | money_without_currency }}"/>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                {% endcase %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                {% if enable_sort_by == true %}
+                    <div class="flex justify-between text-sm font-light items-center">
+                        <span>Sort by:</span>
+                        <select class="py-0 text-sm border-[0.5px] border-transparent ring ring-transparent   focus-within:border-black focus-within:ring-black h-10 w-32" name="sort_by" x-on:change="$refs.submit.click()">
+                            {% for option in target.sort_options %}
+                                <option value="{{ option.value }}" {% if option.value == sort_by %} selected="selected" {% endif %}>{{ option.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                {% endif %}
+            </div>
+
+        </form>
+        <div class="flex-1"></div>
+        <div class="p-5 space-x-8 flex justify-center items-center">
+            <button class="font-light border-b border-black" type="button" @click="handleSubmit('clear')">Clear all</button>
+            <button class="btn-primary w-36 h-12" @click="open = false">Apply</button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,120 @@
+{% liquid
+    if customer
+        assign customer_link = routes.account_url
+    else 
+        assign customer_link = routes.account_login_url
+    endif
+%}
+<div class="relative z-50 w-full mb-10 border-b">
+    <div class="flex items-center h-20 px-5 mx-auto space-x-10 text-gray-600 max-w-7xl ">
+        <div class="basis-1/4">
+            {% if section.settings.logo %}
+                <a href="/">
+                    {{ section.settings.logo | image_url : height:50| image_tag : loading:"lazy", class:"hidden md:block" }}
+                </a>
+            {% else %}
+                <a class="hidden w-full text-xl text-opacity-75 md:text-2xl hover:text-opacity-100 md:block" href="/">{{ shop.name }}</a>
+            {% endif %}
+
+            <img class="w-5 h-5 transition-transform transform cursor-pointer md:hover:scale-125 md:hidden" src="{{ 'menu.svg' | asset_url }}" alt="" @click="$dispatch('toggle-menu')">
+        </div>
+
+
+        <div class="basis-2/4 shrink">
+            <div class="hidden space-x-6 text-sm md:flex" x-data="{current:null}">
+                {% assign chevron_down =  'chevron down.svg' | asset_url %}
+                {% assign chevron_up =  'chevron up.svg' | asset_url %}
+                {% for link in section.settings.menu.links %}
+                    {% if link.levels > 0 %}
+                        <div @click.away="open = false" class="relative" x-data="{open:false, index:'{{ forloop.index }}', child_active:'{{ link.child_active }}'}">
+                            <div @click="open = !open; current = index" class="flex space-x-2 cursor-pointer group">
+                                <span :class="child_active == 'true' && 'border-b text-black'" class="border-black group-hover:text-black group-hover:border-b">{{ link.title }}</span>
+                                <img :src="(open && index == current) ? '{{ chevron_up }}' :  '{{ chevron_down }}' " alt="" src="">
+                            </div>
+                            <div class="absolute left-0 flex flex-col w-48 py-5 mt-2 space-y-2 origin-top-left bg-white border border-gray-200 shadow-xl" x-data="{current_2:null}" x-show="(open == true && index == current)" x-transition:enter-end="translate-y-0 opacity-100" x-transition:enter-start="-translate-y-5 opacity-0" x-transition:enter="transition ease-out duration-300" x-transition:leave-end="-translate-y-5 opacity-0" x-transition:leave-start="translate-y-0 opacity-100" x-transition:leave="transtion ease-in-out duration-300">
+                                {% for link_2 in link.links %}
+                                    {% if link_2.levels > 0 %}
+                                        <div @click.away="open = false" x-data="{open:false, index:'{{ forloop.index }}', child_active:'{{ link_2.child_active }}'}">
+                                            <div @click="open = !open; current_2 = index" class="flex justify-between px-5 cursor-pointer group">
+                                                <span :class="(child_active == 'true' && open) && 'border-b border-black'" class="group-hover:text-black">{{ link_2.title }}</span>
+                                                <img :src="(open && index == current_2) ? '{{ chevron_up }}' :  '{{ chevron_down }}' " alt="" src="">
+                                            </div>
+                                            <div class="flex flex-col py-2 mt-2 space-y-2 bg-metal/5 " x-show="(open == true && index == current_2)" x-transition:enter-end="translate-y-0 opacity-100" x-transition:enter-start="-translate-y-5 opacity-0" x-transition:enter="transition ease-out duration-300">
+                                                {% for link_3 in link_2.links %}
+                                                    <div class="px-6">
+                                                        <a class="hover:text-black" :class="link_active == 'true' && 'border-b border-black'" href="{{ link_3.url }}" x-data="{link_active:'{{ link_3.active }}'}">{{ link_3.title }}</a>
+                                                    </div>
+
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+
+                                    {% else %}
+                                        <div class="px-5">
+                                            <a class="border-black hover:text-black" :class="link_active == 'true' && 'border-b'" href="{{ link_2.url }}" x-data="{link_active:'{{ link_2.active }}'}">{{ link_2.title }}</a>
+                                        </div>
+
+                                    {% endif %}
+
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                    {% else %}
+                        <a href="{{ link.url }}" class="border-black hover:text-black hover:border-b" :class="{'border-b  text-black':(link_active == 'true')}" x-data="{link_active:'{{ link.active }}'}">{{ link.title }}</a>
+                    {% endif %}
+
+                {% endfor %}
+            </div>
+
+            {% if section.settings.logo %}
+                <a href="/">
+                    {{ section.settings.logo | image_url : height:50| image_tag : loading:"lazy", class:"md:hidden mx-auto" }}
+                </a>
+            {% else %}
+                <a class="w-full text-xl text-center text-opacity-75 md:text-2xl md:hidden hover:text-opacity-100" href="/">{{ shop.name }}</a>
+            {% endif %}
+        </div>
+
+        <div class="flex justify-end space-x-2 md-space-x-4 basis-1/4">
+            <img class="w-5 h-5 transition-transform transform cursor-pointer md:hover:scale-110 s" src="{{ 'search.svg' | asset_url }}" alt="" @click="$dispatch('toggle-search')">
+            
+            {% if shop.customer_accounts_enabled %}
+                <a href="{{ customer_link }}">
+                    <img class="hidden w-5 h-5 transition-transform transform cursor-pointer md:hover:scale-110 md:block" src="{{ 'person.svg' | asset_url }}" alt="">
+                </a>
+            {% endif %}
+
+
+            <a href="/cart">
+                <img class="w-5 h-5 transition-transform transform cursor-pointer md:hover:scale-110" src="{{ 'cart filled.svg' | asset_url }}" alt="">
+            </a>
+
+        </div>
+    </div>
+</div>
+
+{% render 'menu-drawer', links:section.settings.menu.links %}
+{% render 'cart-drawer'%}
+{% render 'search-drawer' %}
+
+
+{% schema %}
+
+{
+    "name": "Header",
+    "settings": [
+        {
+            "type": "image_picker",
+            "id": "logo",
+            "label": "Logo"
+        }, {
+            "type": "link_list",
+            "id": "menu",
+            "label": "Menu",
+            "default": "main-menu"
+        }
+    ]
+}
+
+{% endschema %}

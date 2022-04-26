@@ -1,0 +1,34 @@
+{% layout none %}
+<div @click.away="open = false" class="absolute top-0 right-0 z-30 w-full h-screen max-w-lg py-5 bg-white" id="cart_drawer" x-show="open" x-transition:enter-end="opacity-100 translate-x-100" x-transition:enter-start="opacity-0 translate-x-full" x-transition:enter="transition ease-out duration-300" x-transition:leave-end="opacity-0 translate-x-full" x-transition:leave-start="opacity-100 transalte-x-100" x-transition:leave="transition ease-in duration-300">
+    <img class="absolute w-5 h-5 cursor-pointer top-5 right-5" src="{{ 'close.svg' | asset_url }}" @click="$dispatch('toggle-cart')"/>
+    {% if cart.items[0] != blank %}
+        <div class="flex flex-col h-full space-y-10">
+            <span class="px-5 text-xl font-bold">Your cart</span>
+            <div class="flex flex-col px-5 space-y-10 overflow-y-scroll min-h-fit">
+                <div class="flex flex-col space-y-10 divide-y">
+                    {% for item in cart.items %}
+                        {% render 'item-card', item:item %}
+                    {% endfor %}
+                </div>
+                <div class="w-full h-[2px] bg-black"></div>
+                <div class="grid grid-cols-2 gap-y-5">
+                    <span class="text-sm font-bold">Subtotal</span>
+                    <span class="text-sm text-right">{{ cart.items_subtotal_price | money_with_currency }}</span>
+                    <span class="font-bold">Total</span>
+                    <span class="font-bold text-right">{{ cart.total_price | money_with_currency }}</span>
+                </div>
+            </div>
+            <div class="flex-1"></div>
+            <div class="px-5 align-self-end ">
+                <a class="w-full h-12 font-bold btn-primary" href="/cart">View cart</a>
+            </div>
+        </div>
+    {% else %}
+        <div class="flex flex-col items-center justify-center h-full space-y-2">
+            <div class="text-2xl font-bold">Your cart is empty</div>
+            <img class="w-20 h-20" src="{{ 'cart empty.svg' | asset_url }}" alt="">
+            <button @click="$dispatch('toggle-cart')" class="btn-primary" type="button">Back to shopping</button>
+        </div>
+
+    {% endif %}
+</div>

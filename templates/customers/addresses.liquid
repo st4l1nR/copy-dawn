@@ -1,0 +1,100 @@
+<div class="max-w-md px-5 mx-auto" x-data="{show_new_address:false}">
+    {% for shipping_method in checkout.shipping_methods %}
+        *
+        {{ shipping_method.title }}:
+        {{ shipping_method.price | money }}
+    {% endfor %}
+    <div class="flex flex-col items-center justify-center space-y-8 ">
+        <span class="text-4xl text-center">Addresses</span>
+        <div>
+            <a class="text-sm font-light border-b border-black" href="{{ routes.account_url }}">Return to Account details</a>
+        </div>
+        <button @click="show_new_address = !show_new_address" class="w-48 h-12 btn-primary" type="button">Add a new address</button>
+        {% form 'customer_address', customer.new_address, class:"w-full", x-show:"show_new_address"%}
+            <div >
+                <span class="text-xl">Add new address</span>
+                <div class="flex flex-col mt-10 space-y-5">
+                    <div class="flex flex-col space-y-3 md:flex-row md:space-y-0 md:space-x-3">
+                        <input class="flex-1" name="address[first_name]" placeholder="First name" type="text" required>
+                        <input class="flex-1" name="address[last_name]" placeholder="Last name" type="text">
+                    </div>
+                    <input name="address[company]" placeholder="Company" type="text">
+                    <input name="address[address1]" placeholder="Address 1" type="text" required>
+                    <input name="address[address2]" placeholder="Address 2" type="text">
+                    <input name="address[city]" placeholder="City" type="text" required>
+                    <div class="flex flex-col space-y-2">
+                        <label class="text-sm font-ligh text-start" for="country">Country/region</label>
+                        <select id="" name="address[country]" required>
+                            {{ all_country_option_tags }}
+                        </select>
+                    </div>
+                    <input name="address[zip]" placeholder="ZIP/Postal Code" type="text" required>
+                    <input name="address[phone]" placeholder="Phone" type="tel" required>
+                    <div class="flex items-center space-x-2">
+                        {{ form.set_as_default_checkbox }}
+                        <label class="font-light" for="set_default">Set as default address</label>
+                    </div>
+                </div>
+                <div class="flex mt-10 space-x-5">
+                    <button class="w-32 h-12 btn-primary">Add address</button>
+                    <button @click="show_new_address = false" class="w-32 h-12 btn-secondary" type="button">Cancel</button>
+                </div>
+            </div>
+        {% endform %}
+
+    </div>
+    <div class="flex flex-col space-y-8 mt-14">
+        {% for address in customer.addresses %}
+            <div x-data="{show_edit_address:false}">
+                <div class="flex flex-col space-y-1 font-light text-center">
+                    <span>{{ address.first_name }}
+                        {{ address.last_name }}</span>
+                    <span>{{ address.street }}</span>
+                    <span>{{ address.zip }}</span>
+                    <span>{{ address.country }}</span>
+                    <span>{{ address.city }}</span>
+                </div>
+                <div class="flex justify-center mt-5 space-x-2">
+                    <button class="w-32 h-12 btn-secondary" type="button" @click="show_edit_address = !show_edit_address">Edit</button>
+                    <form action="/account/addresses/{{ address.id }}" method="post">
+                        <input name="_method" type="hidden" value="delete">
+                        <button class="w-32 h-12 btn-secondary">Delete</button>
+                    </form>
+
+                </div>
+                {% form 'customer_address', address, class:"w-full", x-show:"show_edit_address" %}
+                    <div class="mt-5">
+                        <span class="text-xl">Edit address</span>
+                        <div class="flex flex-col mt-10 space-y-5">
+                            <div class="flex flex-col space-y-3 md:flex-row md:space-y-0 md:space-x-3">
+                                <input class="flex-1" name="address[first_name]" placeholder="First name" type="text" value="{{ form.first_name }}" required>
+                                <input class="flex-1" name="address[last_name]" placeholder="Last name" type="text" value="{{ form.last_name }}" required>
+                            </div>
+                            <input name="address[company]" placeholder="Company" type="text" value="{{ form.company }}">
+                            <input name="address[address1]" placeholder="Address 1" type="text" value="{{ form.address1 }}" required>
+                            <input name="address[address2]" placeholder="Address 2" type="text" value="{{ form.address2 }}">
+                            <input name="address[city]" placeholder="City" type="text" value="{{ form.city }}">
+                            <div class="flex flex-col space-y-2">
+                                <label class="text-sm font-ligh text-start" for="country">Country/region</label>
+                                <select id="" name="address[country]" required x-ref="select_country"  x-init="const x = $refs.select_country.querySelectorAll('option').forEach( option => { if (option.value == '{{ form.country }}') option.selected = true })">
+                                    {{ all_country_option_tags }}
+                                </select>
+                            </div>
+                            <input name="address[zip]" placeholder="ZIP/Postal Code" type="text" value="{{ form.zip }}" required> 
+                            <input name="address[phone]" placeholder="Phone" type="tel" value="{{ form.phone }}" required>
+                            <div class="flex items-center space-x-2">
+                                {{ form.set_as_default_checkbox }}
+                                <label class="font-light" for="set_default">Set as default address </label>
+                            </div>
+                        </div>
+                        <div class="flex mt-10 space-x-5">
+                            <button class="h-12 btn-primary">Update address</button>
+                            <button @click="show_edit_address = false" class="h-12 btn-secondary" type="button">Cancel</button>
+                        </div>
+                    </div>
+                {% endform %}
+            </div>
+
+        {% endfor %}
+    </div>
+</div>

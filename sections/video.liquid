@@ -1,0 +1,35 @@
+<div class="px-5 mx-auto mt-10 max-w-7xl">
+    {% if section.settings.url.type == "youtube" %}
+        {% assign url = 'https://www.youtube.com/embed/' | append: section.settings.url.id %}
+    {% else %}
+        {% assign url = 'https://player.vimeo.com/video/' | append: section.settings.url.id %}
+    {% endif %}
+    <div class="aspect-w-16 aspect-h-9">
+        <iframe allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen frameborder="0" src="{{ url }}"></iframe>
+    </div>
+
+
+</div>
+
+
+{% schema %}
+
+{
+    "name": "Video",
+    "settings": [
+        {
+            "type": "video_url",
+            "id": "url",
+            "accept": [
+                "youtube",
+                "vimeo"
+            ],
+            "label": "label"
+        }
+    ],
+    "presets":[{
+        "name":"Video"
+    }]
+}
+
+{% endschema %}

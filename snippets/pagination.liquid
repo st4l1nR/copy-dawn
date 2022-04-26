@@ -1,0 +1,27 @@
+<div class="flex space-x-10 mt-10 justify-center items-center">
+    {% if paginate.previous.is_link %}
+        <a href="{{ paginate.previous.url }}">
+            <img src="{{ 'chevron left.svg' | asset_url }}" alt="">
+        </a>
+    {% endif %}
+
+    {% for part in paginate.parts %}
+        {% if part.is_link %}
+            <a class="px-1 hover:border-b border-black" href="{{ part.url }}">{{ part.title }}</a>
+        {% else %}
+            {% assign is_number = part.title | abs  %}
+            {% if is_number == 0  %}
+                <span class="px-1  border-black">{{ part.title }}</span>
+            {% else %}
+
+                <a class="px-1 border-b border-black">{{ part.title }}</a>
+            {% endif %}
+
+        {% endif %}
+    {% endfor %}
+    {% if paginate.next.is_link %}
+        <a href="{{ paginate.next.url }}">
+            <img src="{{ 'chevron right.svg' | asset_url }}" alt="">
+        </a>
+    {% endif %}
+</div>

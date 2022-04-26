@@ -1,0 +1,74 @@
+<div class="px-5 mx-auto max-w-7xl" x-data="{desktop_layout:'{{ section.settings.desktop_layout }}', featured_image_height:'{{section.settings.featured_image_height }}'}">
+    <span class="text-4xl">{{ blog.title | capitalize }}</span>
+    {% paginate blog.articles by 6 %}
+        <div :class="desktop_layout == 'grid' ?'grid grid-cols-1 md:grid-cols-2 gap-x-2 gap-y-10' : 'blog-collage' " class="mt-12">
+            {% for article in blog.articles %}
+                {% render 'article-card', article:article %}
+            {% endfor %}
+        </div>
+
+        {% if paginate.pages > 1 %}
+            {% render 'pagination', paginate:paginate %}
+        {% endif %}
+    {% endpaginate %}
+</div>
+
+
+{% schema %}
+
+{
+    "name": "Blog",
+    "settings": [
+        {
+            "type": "header",
+            "content": "BLOG POST CARD"
+        }, {
+            "type": "select",
+            "id": "desktop_layout",
+            "label": "Desktop layout",
+            "options": [
+                {
+                    "value": "collage",
+                    "label": "Collage"
+                }, {
+                    "value": "grid",
+                    "label": "Grid"
+                }
+            ],
+            "default": "grid",
+            "info": "Posts are stacked on mobile."
+        }, {
+            "type": "select",
+            "id": "featured_image_height",
+            "label": "Fetured image height",
+            "options": [
+                {
+                    "value": "adapt",
+                    "label": "Adapt to image"
+                }, {
+                    "value": "small",
+                    "label": "Small"
+                }, {
+                    "value": "medium",
+                    "label": "Medium"
+                }, {
+                    "value": "large",
+                    "label": "Large"
+                }
+            ],
+            "default": "adapt"
+        }, {
+            "type": "checkbox",
+            "id": "show_date",
+            "label": "Show date",
+            "default": true
+        }, {
+            "type": "checkbox",
+            "id": "show_author",
+            "label": "Show author",
+            "default": false
+        }
+    ]
+}
+
+{% endschema %}

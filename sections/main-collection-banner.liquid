@@ -1,0 +1,37 @@
+<div class="max-w-7xl px-5 mx-auto flex flex-col md:flex-row">
+    <div class="flex flex-col space-y-5 {% if section.settings.show_collection_image == true %} w-1/2 {% endif %}">
+        <span class="text-4xl">{{ collection.title }}</span>
+        {% if section.settings.show_collection_description == true %}
+            <span class="text-xl font-light">{{ collection.description }}</span>
+        {% endif %}
+    </div>
+    {% if section.settings.show_collection_image == true %}
+        {{ collection.image | image_url: width:1600 | image_tag: class:"w-full md:w-1/2 object-cover object-center max-h-48" }}
+    {% endif %}
+
+</div>
+
+
+{% schema %}
+
+{
+    "name": "Collection banner",
+    "settings": [
+        {
+            "type": "paragraph",
+            "content": "Add a description or image by editing your collection."
+        }, {
+            "type": "checkbox",
+            "id": "show_collection_description",
+            "label": "Show collection description",
+            "default": false
+        }, {
+            "type": "checkbox",
+            "id": "show_collection_image",
+            "label": "Show collection image",
+            "default": false
+        }
+    ]
+}
+
+{% endschema %}

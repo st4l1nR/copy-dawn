@@ -1,0 +1,17 @@
+<div>
+    <span class="text-2xl">Please adjust the following</span>
+    <ul class="pl-5 mt-3 text-sm font-light list-disc">
+        {%- for field in form.errors -%}
+            <li>
+                {%- if field == 'form' -%}
+                    {{ form.errors.messages[field] }}
+                {%- else -%}
+                    <a href="#RegisterForm-{{ field }}">
+                        {{ form.errors.translated_fields[field] | capitalize }}
+                        {{ form.errors.messages[field] }}
+                    </a>
+                {%- endif -%}
+            </li>
+        {%- endfor -%}
+    </ul>
+</div>

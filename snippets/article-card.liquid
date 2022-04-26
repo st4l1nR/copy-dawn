@@ -1,0 +1,25 @@
+<a href="{{ article.url }}" class="flex flex-col space-y-3 group ">
+    {% if article.image != blank %}
+        <div class="w-full overflow-hidden"  :class="{'aspect-w-3 aspect-h-1':(featured_image_height == 'small'), 'aspect-w-3 aspect-h-2':(featured_image_height == 'medium'), 'aspect-w-3 aspect-h-[2.5]':(featured_image_height == 'large')}">
+            {{ article.image | image_url: width:1600 | image_tag: class:"w-full h-full object-cover object-center transform transition-all group-hover:scale-105 max-h-full", alt:article.title }}
+        </div>
+    {% else %}
+        {{ 'image' | placeholder_svg_tag }}
+    {% endif %}
+    <div class="flex flex-col space-y-2">
+        <div>
+            <span class="text-2xl border-b-2 border-transparent group-hover:border-black">{{ article.title }}</span>
+        </div>
+
+        <div class="flex space-x-3 text-xs font-light">
+            {% if section.settings.show_date %}
+                <span>{{ article.created_at | date: format:"abbreviated_date" | upcase }}</span>
+            {% endif %}
+            {% if section.settings.show_author %}
+                <span class="font-bold">.</span>
+                <span>{{ article.author | upcase }}</span>
+            {% endif %}
+        </div>
+    </div>
+    <span :class="desktop_layout == 'collage' && 'description'" class="font-light text-truncate">{{ article.content | strip_html | truncatewords: 30 }}</span>
+</a>

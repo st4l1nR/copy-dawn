@@ -1,0 +1,94 @@
+{% liquid
+    if customer
+        assign customer_link = routes.account_url
+    else 
+        assign customer_link = routes.account_login_url
+    endif
+%}
+
+<div @toggle-menu.window="open = !open" class="fixed inset-0 z-50 bg-black bg-opacity-70" x-data="{open:false}" x-show="open">
+    <div @click.away="open = false" class="absolute left-0 w-full h-full max-w-xs px-8 pt-20 pb-8 bg-white" x-show="open" x-transition:enter-end="opacity-100 translate-x-100" x-transition:enter-start="opacity-0 -translate-x-full" x-transition:enter="transition ease-out duration-300" x-transition:leave-end="opacity-0 -translate-x-full" x-transition:leave-start="opacity-100 transalte-x-100" x-transition:leave="transition ease-in duration-300">
+        <img class="absolute cursor-pointer w-7 h-7 top-10 right-10" src="{{ 'close.svg' | asset_url }}" @click="$dispatch('toggle-menu')"/>
+        <div class="flex flex-col justify-between h-full">
+            <div class="relative flex flex-col space-y-3 text-lg" x-data="{current:null}">
+                {% for link in links %}
+                    {% if link.levels > 0 %}
+                        <div x-data="{index:'{{ forloop.index }}'}">
+                            <button @click="current = index" class="flex items-center space-x-3" type="button">
+                                <span>{{ link.title }}</span>
+                                <img class="w-5" src="{{ 'arrow right.svg' | asset_url }}" alt="">
+                            </button>
+                            <div class="absolute inset-0 bg-white" x-show="current == index">
+                                <button @click="current = null" class="flex items-center space-x-3 text-sm font-light" type="button">
+                                    <img class="w-3" src="{{ 'arrow left.svg' | asset_url }}" alt="">
+                                    <span>{{ link.title }}</span>
+                                </button>
+                                <div class="flex flex-col mt-5 space-y-3" x-data="{current_2:null}">
+                                    {% for link_2 in link.links %}
+                                        {% if link_2.levels > 0 %}
+                                            <div x-data="{index:'{{ forloop.index }}'}">
+                                                <button @click="current_2 = index" class="flex items-center space-x-3" type="button">
+                                                    <span>{{ link_2.title }}</span>
+                                                    <img class="w-5" src="{{ 'arrow right.svg' | asset_url }}" alt="">
+                                                </button>
+                                                <div class="absolute inset-0 bg-white" x-show="current_2 == index">
+                                                    <button @click="current_2 = null" class="flex items-center space-x-3 text-sm font-light" type="button">
+                                                        <img class="w-3" src="{{ 'arrow left.svg' | asset_url }}" alt="">
+                                                        <span>{{ link_2.title }}</span>
+                                                    </button>
+                                                    <div class="flex flex-col mt-5 space-y-3">
+                                                        {% for link_3 in link_2.links %}
+                                                            <a href="{{ link_3.url }}">{{ link_3.title }}</a>
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <a href="{{ link_2.url }}">{{ link_2.title }}</a>
+                                        {% endif %}
+
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <a href="{{ link.url }}">{{ link.title }}</a>
+                    {% endif %}
+
+                {% endfor %}
+            </div>
+            <div class="flex flex-col space-y-5">
+                {% if shop.customer_accounts_enabled %}
+                    <a class="flex space-x-2" href="{{ customer_link }}">
+                        <img class="w-5 h-5" src="{{ 'person.svg' | asset_url }}" alt="">
+                        <span class="text-sm">
+                            {% if customer %}
+                                Account
+                            {% else %}
+                                Login
+                            {% endif %}
+                        </span>
+                    </a>
+                {% endif %}
+                <div class="flex space-x-5">
+                    <a href="">
+                        <img class="w-5 h-5 cursor-pointer" src="{{ 'twitter.svg' | asset_url }}" alt="">
+                    </a>
+                    <a href="">
+                        <img class="w-5 h-5 cursor-pointer" src="{{ 'facebook.svg' | asset_url }}" alt="">
+                    </a>
+                    <a href="">
+                        <img class="w-5 h-5 cursor-pointer" src="{{ 'instagram.svg' | asset_url }}" alt="">
+                    </a>
+                    <a href="">
+                        <img class="w-5 h-5 cursor-pointer" src="{{ 'tiktok.svg' | asset_url }}" alt="">
+                    </a>
+                    <a href="">
+                        <img class="w-5 h-5 cursor-pointer" src="{{ 'youtube.svg' | asset_url }}" alt="">
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

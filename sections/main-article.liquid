@@ -1,0 +1,181 @@
+<script>
+    const functions = {
+        generateAspectRatios() {
+            this
+                .$refs
+                .article_content
+                .querySelectorAll("iframe")
+                .forEach(iframe => {
+                    const iframeContainer = document
+                        .createElement("div")
+                        iframeContainer
+                        .classList
+                        .add("aspect-w-16", "aspect-h-9")
+                    iframe
+                    .parentNode
+                    .replaceChild(iframeContainer, iframe)
+                iframeContainer
+                .appendChild(iframe)
+        })
+}}
+</script>
+<div class="mx-auto max-w-7xl" x-data="{...functions}">
+    {% for block in section.blocks %}
+        {% case block.type %}
+            {% when 'featured_image' %}
+                {% if article.image != blank %}
+                    <div :class="{'aspect-w-3 aspect-h-1':(featured_image_height == 'small'), 'aspect-w-3 aspect-h-2':(featured_image_height == 'medium'), 'aspect-w-3 aspect-h-[2.5]':(featured_image_height == 'large')}" x-data="{featured_image_height:'{{ block.settings.featured_image_height }}'}">
+                        {{ article.image | image_url: width:1600 | image_tag: class:"w-full max-h-full object-cover object-center"}}
+                    </div>
+                {% endif %}
+        {% endcase %}
+    {% endfor %}
+
+    <div class="max-w-4xl px-5 mx-auto mt-20">
+        <div class="flex flex-col space-y-8">
+            {% for block in section.blocks %}
+                {% case block.type %}
+                    {% when 'title' %}
+                        <div class="flex flex-col space-y-2">
+                            <span class="text-4xl">{{ article.title }}</span>
+                            <div class="flex space-x-3 text-xs font-light">
+                                {% if block.settings.show_date %}
+                                    <span>{{ article.created_at | date: format:"abbreviated_date" | upcase }}</span>
+                                {% endif %}
+                                {% if block.settings.show_author %}
+                                    <span class="font-bold">.</span>
+                                    <span>{{ article.author | upcase }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% when 'share' %}
+                        <div class="flex space-x-1 cursor-pointer group">
+                            <img class="w-5" src="{{ 'share.svg' | asset_url }}" alt="">
+                            <span class="border-b border-transparent group-hover:border-black">{{ block.settings.text }}</span>
+                        </div>
+                    {% when 'content' %}
+                        <div class="pt-2 prose max-w-none prose-table:border prose-td:border prose-td:pl-4 prose-td:pt-4 prose-headings:font-normal" x-init="$nextTick(() => {generateAspectRatios()})" x-ref="article_content">{{ article.content }}</div>
+                {% endcase %}
+            {% endfor %}
+        </div>
+        <a class="flex items-center mx-auto space-x-1 group max-w-fit mt-14" href="{{ blog.url }}">
+            <img class="w-5 transition-all transform group-hover:-translate-x-2" src="{{ 'arrow left.svg' | asset_url }}" alt="">
+            <span class="text-lg">Back to blog</span>
+        </a>
+    </div>
+
+    {% if blog.comments_enabled? %}
+
+        <div class="mt-14 bg-[#F6F6F6]">
+            <div class="max-w-4xl px-5 py-10 mx-auto ">
+                <div>
+                    <span class="text-2xl">{{ article.comments.size }}
+                        comments</span>
+                    <div class="flex flex-col mt-5 space-y-5 ">
+                        {% for comment in article.comments %}
+                            <div class="flex flex-col p-5 space-y-5 bg-white">
+                                <span>{{ comment.content }}</span>
+                                <div class="flex items-center justify-end space-x-3 text-xs font-light">
+                                    <span>{{ comment.author | upcase }}</span>
+                                    <span class="font-bold">.</span>
+                                    <span>{{ comment.created_at | date: format:"abbreviated_date" | upcase }}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% form 'new_comment' , article %}
+                    <div class="mt-10">
+                        <span class="text-2xl">Leave a comment</span>
+                        {% if form.errors %}
+                            {% render 'form-errors', form:form %}
+                        {% endif %}
+                        <div class="flex flex-col mt-5 space-y-5 md:space-y-8">
+                            <div class="grid grid-cols-1 gap-5 md:gap-8 md:grid-cols-2">
+                                <input name="comment[author]" placeholder="Name" required type="text" value="{{ form.author }}">
+                                <input name="comment[email]" placeholder="Email" required type="email" value="{{ form.email }}">
+                            </div>
+                            <textarea cols="30" name="comment[body]" placeholder="Comment" required rows="10" value="{{ form.body }}"></textarea>
+                            <button class="h-12 max-w-fit btn-primary">Post comment</button>
+                        </div>
+                    </div>
+                {% endform %}
+            </div>
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+{% schema %}
+
+{
+    "name": "Blog post",
+    "blocks": [
+        {
+            "name": "Featured image",
+            "type": "featured_image",
+            "settings": [
+                {
+                    "type": "select",
+                    "id": "featured_image_height",
+                    "label": "Fetured image height",
+                    "options": [
+                        {
+                            "value": "adapt",
+                            "label": "Adapt to image"
+                        }, {
+                            "value": "small",
+                            "label": "Small"
+                        }, {
+                            "value": "medium",
+                            "label": "Medium"
+                        }, {
+                            "value": "large",
+                            "label": "Large"
+                        }
+                    ],
+                    "default": "adapt",
+                    "info": "For best results, use an image with a 3:2 aspect ratio."
+                }
+            ],
+            "limit": 1
+        }, {
+            "name": "Title",
+            "type": "title",
+            "settings": [
+                {
+                    "type": "checkbox",
+                    "id": "show_date",
+                    "label": "Show date",
+                    "default": false
+                }, {
+                    "type": "checkbox",
+                    "id": "show_author",
+                    "label": "Show author",
+                    "default": false
+                }
+            ],
+            "limit": 1
+        }, {
+            "name": "Share",
+            "type": "share",
+            "settings": [
+                {
+                    "type": "text",
+                    "id": "text",
+                    "label": "Text",
+                    "default": "Share"
+                }
+            ],
+            "limit": 2
+        }, {
+            "name": "Content",
+            "type": "content",
+            "limit": 1
+        }
+    ]
+}
+
+{% endschema %}

@@ -1,0 +1,6 @@
+<form class="flex flex-1 px-4 py-3 space-x-3 border border-black focus-within:border focus-within:ring-1 ring-black" action="{{ routes.search_url }}">
+    <input class="flex-1 h-full p-0 border-0 focus-within:border-0 focus-within:ring-0" type="text" placeholder="Search" name="q" value="{{ search.terms | escape }}">
+    <button>
+        <img class="cursor-pointer" src="{{ "search.svg" | asset_url }}" alt="">
+    </button>
+</form>

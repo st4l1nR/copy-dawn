@@ -1,0 +1,49 @@
+{{ 'utils.js' | asset_url | script_tag }}
+
+
+<div @update-collection.window="updateSections('collections/'+ '{{ collection.title | downcase }}', $event.detail.query, ['{{ section.id }}'], ['#product_grid'])" class="max-w-7xl px-5 mx-auto" x-data="{loading:false, updateSections:utils.updateSections}">
+    {% render 'filters-form', target:collection, type:'collection', action:collection.url, enable_filters:section.settings.show_filters, enable_sort_by:section.settings.show_sort_by %}
+    <div id="product_grid">
+        {% paginate collection.products by section.settings.products_per_page %}
+            <div :class="loading && 'opacity-50'" class="grid grid-cols-2 gap-5 mt-10 md:grid-cols-4 relative">
+                {% for product in collection.products %}
+                    {% render 'product-card', product:product %}
+                {% endfor %}
+                <div class="absolute top-1/2 left-1/2" x-show="loading">
+                    {% include 'spinner' %}
+                </div>
+            </div>
+            {% render 'pagination', paginate:paginate %}
+        {% endpaginate %}
+    </div>
+</div>
+
+
+{% schema %}
+
+{
+    "name": "Product grid",
+    "settings": [
+        {
+            "type": "range",
+            "id": "products_per_page",
+            "label": "Product per page",
+            "min": 4,
+            "max": 24,
+            "step": 1,
+            "default": 4
+        }, {
+            "type": "checkbox",
+            "id": "show_filters",
+            "label": "Show filters",
+            "default": true
+        }, {
+            "type": "checkbox",
+            "id": "show_sort_by",
+            "label": "Show sort by",
+            "default": true
+        }
+    ]
+}
+
+{% endschema %}

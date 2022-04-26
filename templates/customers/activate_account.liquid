@@ -1,0 +1,17 @@
+{% form 'activate_customer_password' %}
+    <div class="max-w-sm px-5 mx-auto flex flex-col space-y-10">
+        <span class="text-4xl text-center">Activate account</span>
+        <div class="font-light text-center">Create your password to activate your account</div>
+        {% if form.errors %}
+            {% render 'form-errors', form:form %}
+        {% endif %}
+        <div class="flex flex-col space-y-5">
+            <input name="customer[password]" placeholder="Password" type="password">
+            <input name="customer[password_confirmation]" placeholder="Confirm password" type="password">
+        </div>
+        <div class="flex justify-center space-x-5">
+            <button class="btn-primary h-12 max-w-fit" value="Activate account">Activate account</button>
+            <button class="btn-secondary h-12 max-w-fit" name="decline" value="Decline invitation">Decline invitation</button>
+        </div>
+    </div>
+{% endform %}
