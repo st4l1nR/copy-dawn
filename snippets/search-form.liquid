@@ -1,6 +1,38 @@
-<form class="flex flex-1 px-4 py-3 space-x-3 border border-black focus-within:border focus-within:ring-1 ring-black" action="{{ routes.search_url }}">
-    <input class="flex-1 h-full p-0 border-0 focus-within:border-0 focus-within:ring-0" type="text" placeholder="Search" name="q" value="{{ search.terms | escape }}">
-    <button>
-        <img class="cursor-pointer" src="{{ "search.svg" | asset_url }}" alt="">
-    </button>
-</form>
+{{ 'utils.js' | asset_url | script_tag }}
+<div class="relative flex-1 w-full" x-data="{search:'', loading:false, predictResults:{products:[]}, predictSearch:utils.predictSearch}">
+    <form class="flex px-4 py-3 space-x-3 border border-black focus-within:border focus-within:ring-1 ring-black" action="{{ routes.search_url }}">
+        <input class="flex-1 h-full p-0 border-0 focus-within:border-0 focus-within:ring-0" type="text" placeholder="Search" name="q" x-model="search" value="{{ search.terms | escape }}" x-on:input.change="$event.target.value && predictSearch($event.target.value,{type:'product', limit:4})">
+        <button>
+            <img class="cursor-pointer" src="{{ "search.svg" | asset_url }}" alt="">
+        </button>
+    </form>
+    <div class="absolute origin-top mt-2 space-y-4 flex flex-col bg-white w-full z-50" x-show="search">
+        <div class="flex flex-col space-y-3">
+            <template x-if="predictResults.products[0]">
+                <div>
+                    <span class="border-b text-xs font-light mx-4">PRODUCTS</span>
+                    <template class="flex flex-col space-y-5 " x-for="product in predictResults.products">
+                        <a :href="product.url" class="flex space-x-2 hover:bg-sky group py-3 items-center px-4">
+                            <img :src="product.image" alt="" class="w-16 object-cover">
+                            <span class="max-h-fit group-hover:border-black border-b border-transparent" x-text="product.title"></span>
+                        </a>
+                    </template>
+                </div>
+            </template>
+
+        </div>
+        <a :href="`/search?q=${search}`" class="text-sm font-light flex justify-between  border-b hover:bg-[#F6F6F6] group py-2 px-4">
+            <div class="flex whitespace-pre">
+                <span>Search for
+                </span>
+                <div class="flex">
+                    <span>"</span>
+                    <span x-text="search"></span>
+                    <span>"</span>
+                </div>
+
+            </div>
+            <img class="transition transform group-hover:translate-x-2" src="{{ 'arrow right.svg' | asset_url }}" alt="">
+        </a>
+    </div>
+</div>

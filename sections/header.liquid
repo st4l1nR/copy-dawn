@@ -5,7 +5,9 @@
         assign customer_link = routes.account_login_url
     endif
 %}
-<div class="relative z-50 w-full mb-10 border-b">
+
+{{'utils.js' | asset_url | script_tag }}
+<div class="relative z-50 w-full mb-10 border-b" x-data="{updateSections:utils.updateSections}" @update-header.window="updateSections('','',['{{ section.id }}'])">
     <div class="flex items-center h-20 px-5 mx-auto space-x-10 text-gray-600 max-w-7xl ">
         <div class="basis-1/4">
             {% if section.settings.logo %}
@@ -76,26 +78,27 @@
             {% endif %}
         </div>
 
-        <div class="flex justify-end space-x-2 md-space-x-4 basis-1/4">
-            <img class="w-5 h-5 transition-transform transform cursor-pointer md:hover:scale-110 s" src="{{ 'search.svg' | asset_url }}" alt="" @click="$dispatch('toggle-search')">
-            
+        <div class="flex justify-end items-center space-x-3 md-space-x-4 basis-1/4">
+            <img class="w-5 transition-transform transform cursor-pointer md:hover:scale-110 s" src="{{ 'search.svg' | asset_url }}" alt="" @click="$dispatch('toggle-search')">
+
             {% if shop.customer_accounts_enabled %}
                 <a href="{{ customer_link }}">
-                    <img class="hidden w-5 h-5 transition-transform transform cursor-pointer md:hover:scale-110 md:block" src="{{ 'person.svg' | asset_url }}" alt="">
+                    <img class="hidden w-5 transition-transform transform cursor-pointer md:hover:scale-110 md:block" src="{{ 'person.svg' | asset_url }}" alt="">
                 </a>
             {% endif %}
 
 
-            <a href="/cart">
-                <img class="w-5 h-5 transition-transform transform cursor-pointer md:hover:scale-110" src="{{ 'cart filled.svg' | asset_url }}" alt="">
+            <a class="relative" href="{{ routes.cart_url }}">
+                <img class="w-5 transition-transform transform cursor-pointer md:hover:scale-110" src="{{ 'cart filled.svg' | asset_url }}" alt="">
+                {% if cart.item_count > 0 %}
+                    <div class="w-5 h-5 bg-black rounded-full flex items-center justify-center text-white absolute -right-2 -bottom-2 text-xs">{{ cart.item_count }}</div>
+                {% endif %}
             </a>
-
         </div>
     </div>
 </div>
 
 {% render 'menu-drawer', links:section.settings.menu.links %}
-{% render 'cart-drawer'%}
 {% render 'search-drawer' %}
 
 

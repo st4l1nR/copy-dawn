@@ -15,7 +15,8 @@ module.exports = {
         sans:["Assistant", ...defaultTheme.fontFamily.sans]
       },
       colors:{
-        metal:'#121212BF'
+        metal:'#121212BF',
+        sky:"#F6F6F6",
       }
     },
   },

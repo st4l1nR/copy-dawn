@@ -45,18 +45,16 @@
             {% endfor %}
         </div>
     {% endfor %}
-    <div class="grid grid-cols-1 md:grid-cols-2">
-        {% form , 'customer' %}
-            <div class="flex max-w-xs px-3 py-2 border border-black h-11 focus-within:border focus-within:ring-black">
-                <input class="flex-1 w-full h-full p-0 border-0 focus-within:border-0 focus-within:ring-0" type="email" name="contact[email]" id="" value="{{ form.email }}" placeholder="Email">
-                <button>
-                    <img class="cursor-pointer" src="{{ 'arrow right.svg' | asset_url }}" alt="">
-                </button>
 
-            </div>
-            <div></div>
-        {% endform %}
-    </div>
+    {% form , 'customer' %}
+        <div class="flex max-w-xs px-3 py-2 border border-black h-11 focus-within:border focus-within:ring-black">
+            <input class="flex-1 w-full h-full p-0 border-0 focus-within:border-0 focus-within:ring-0" type="email" name="contact[email]" id="" value="{{ form.email }}" placeholder="Email">
+            <button>
+                <img class="cursor-pointer" src="{{ 'arrow right.svg' | asset_url }}" alt="">
+            </button>
+        </div>
+    {% endform %}
+
     <div class="flex flex-col space-y-5">
         <div class="flex justify-center flex-space-x-3">
             {% for type in shop.enabled_payment_types%}
@@ -65,7 +63,34 @@
         </div>
         <span class="text-sm font-light text-center">© 2022 yadamarket</span>
     </div>
+    <div class="flex justify-center space-x-5">
+        {% if section.settings.show_language_selector %}
+            {% form 'localization', x-data:"", x-ref:"language_form" %}
+                <select @change="$refs.language_form.submit()" name="language_code">
+                    {% for language in localization.available_languages %}
+                        <option value="{{ language.iso_code }}" {%- if language == localization.language %} selected="selected" {% endif %}>
+                            {{ language.endonym_name }}
+                        </option>
+                    {% endfor %}
+                </select>
 
+
+            {% endform %}
+        {% endif %}
+        {% if section.settings.show_country_selector %}
+            {% form 'localization', x-data:"", x-ref:"country_form" %}
+                <select @change="$refs.country_form.submit()" name="country_code">
+                    {% for country in localization.available_countries %}
+                        <option value="{{ country.currency.iso_code }}" {%- if country == localization.country %} selected="selected" {% endif %}>
+                            {{ country.name }}
+                            ({{ country.currency.iso_code }}) -
+                            {{ country.currency.symbol }}
+                        </option>
+                    {% endfor %}
+                </select>
+            {% endform %}
+        {% endif %}
+    </div>
 </div>
 
 
@@ -88,6 +113,16 @@
             "id": "show_email_signup_heading",
             "label": "Heading",
             "default": "Subscribe to our emails"
+        }, {
+            "type": "checkbox",
+            "id": "show_language_selector",
+            "label": "Show langugage selector",
+            "default": true
+        }, {
+            "type": "checkbox",
+            "id": "show_country_selector",
+            "label": "Show country selector",
+            "default": true
         }
     ],
     "blocks": [

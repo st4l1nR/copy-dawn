@@ -4,7 +4,7 @@
     assign current_variant = product.selected_or_first_available_variant
 %}
 
-
+{% render 'cart-drawer'%}
 {% form "product", product, x-data:"", x-ref:"product_form" %}
     <div id="product_container" class="flex flex-col md:flex-row min-h-screen  mx-auto mt-10 md:space-x-5 max-w-7xl px-5" @update-product.window="updateSections('products/'+'{{ product.handle }}', $event.detail.query, getSectionsId(), [])" x-data="{selectVariant:utils.selectVariant, addToCart:utils.addToCart, updateSections:utils.updateSections, getSectionsId:utils.getSectionsId}">
         <input type="hidden" name="id" value="{{ current_variant.id }}">

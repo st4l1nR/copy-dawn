@@ -21,8 +21,10 @@ const utils = {
       (variant) => variant.title == selectedOptions.join(" / ")
     );
     if (!selectedVariant) return;
-    history.pushState({},null,`${product.url}?variant=${selectedVariant.id}`);
-    this.$dispatch('update-product',{query:'variant='+selectedVariant.id});
+    history.pushState({}, null, `${product.url}?variant=${selectedVariant.id}`);
+    this.$dispatch("update-product", {
+      query: "variant=" + selectedVariant.id,
+    });
   },
 
   async addToCart(productForm) {
@@ -32,6 +34,7 @@ const utils = {
         method: "POST",
         body: formData,
       });
+      this.$dispatch("update-header")
       this.$dispatch("update-cart-drawer");
       this.$dispatch("toggle-cart");
     } catch (error) {
@@ -39,7 +42,7 @@ const utils = {
     }
   },
   async updateCartItem(id, quantity) {
-    this.loading = true
+    this.loading = true;
     try {
       await fetch(window.Shopify.routes.root + "cart/change.js", {
         method: "POST",
@@ -51,20 +54,25 @@ const utils = {
           quantity,
         }),
       });
+      this.$dispatch('update-header')
       this.$dispatch("update-cart-drawer");
       this.$dispatch("update-cart");
     } catch (error) {
       console.error(error);
     }
-    this.loading = false
+    this.loading = false;
   },
-  getSectionId(){
+  getSectionId() {
     try {
-      const sections = [...document.body.querySelector("main").querySelectorAll('.shopify-section')]
-      const section = sections.find(section => section.id.includes(name))
-      return section.id.slice(section.id.indexOf("template"))
+      const sections = [
+        ...document.body
+          .querySelector("main")
+          .querySelectorAll(".shopify-section"),
+      ];
+      const section = sections.find((section) => section.id.includes(name));
+      return section.id.slice(section.id.indexOf("template"));
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
   },
   getSectionsId() {
@@ -75,7 +83,7 @@ const utils = {
     ].map((section) => section.id.slice(section.id.indexOf("template")));
   },
   async updateSections(path, query, sections_id, targets_id = []) {
-    this.loading = true
+    this.loading = true;
     try {
       const sections = await (
         await fetch(
@@ -92,29 +100,58 @@ const utils = {
           `#shopify-section-${sectionId}`
         );
         if (targets_id[idx]) {
-          const newTarget = newSection.querySelector(targets_id[idx])
-          const oldTarget = oldSection.querySelector(targets_id[idx])
-          oldTarget.replaceWith(newTarget)
+          const newTarget = newSection.querySelector(targets_id[idx]);
+          const oldTarget = oldSection.querySelector(targets_id[idx]);
+          oldTarget.replaceWith(newTarget);
         } else oldSection.replaceWith(newSection);
-        
       });
-      this.loading = false
+      this.loading = false;
     } catch (error) {
       console.error(error);
     }
   },
-  async updateView(path, query, view_id,  target_id) {
+  async updateView(path, query, view_id, target_id) {
+    this.loading = true;
+    try {
+      console.log(
+        window.Shopify.routes.root + `${path}?view=${view_id}&${query}`
+      );
+      const parser = new DOMParser();
+      let newView = await (
+        await fetch(
+          window.Shopify.routes.root + `${path}?view=${view_id}&${query}`
+        )
+      ).text();
+      newView = parser.parseFromString(newView, "text/html").body.firstChild;
+      const oldView = document.body.querySelector(`#${target_id}`);
+      oldView.replaceWith(newView);
+    } catch (error) {
+      console.error(error);
+    }
+    this.loading = false;
+  },
+  async predictSearch(query, resources) {
     this.loading = true
     try {
-      console.log(window.Shopify.routes.root + `${path}?view=${view_id}&${query}`)
-      const parser = new DOMParser()
-      let newView = await (await fetch(window.Shopify.routes.root + `${path}?view=${view_id}&${query}`)).text();
-      newView = parser.parseFromString(newView, "text/html").body.firstChild
-      const oldView = document.body.querySelector(`#${target_id}`);
-      oldView.replaceWith(newView)
+      let params = new URLSearchParams({ q: query });
+      Object.entries(resources).forEach(([key, value]) => {
+        if (typeof value == "object") {
+          Object.entries(value).forEach(([key2, value2]) => {
+            params.append(`resources[${key}][${key2}]`, `${value2}`);
+          });
+        } else params.append(`resources[${key}]`, `${value}`);
+      });
+
+      const response = await (
+        await fetch(
+          window.Shopify.routes.root +
+            `search/suggest.json?${params.toString()}`
+        )
+      ).json();
+      this.predictResults = response.resources.results;
     } catch (error) {
       console.error(error);
     }
     this.loading = false
-  }
+  },
 };
